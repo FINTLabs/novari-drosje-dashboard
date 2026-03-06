@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/@digdir/designsystemet/dist/config.schema.json",
+  "outDir": "./design-tokens",
+  "themes": {
+    "novari": {
+      "colors": {
+        "main": {
+          "accent": "#F76650"
+        },
+        "support": {
+          "brand1": "#6B133D",
+          "brand2": "#7F78E8"
+        },
+        "neutral": "#F8ECDC"
+      },
+      "borderRadius": 4
+    }
+  }
+}

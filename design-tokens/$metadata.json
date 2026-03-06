@@ -1,0 +1,22 @@
+{
+  "tokenSetOrder": [
+    "primitives/globals",
+    "primitives/modes/size/small",
+    "primitives/modes/size/medium",
+    "primitives/modes/size/large",
+    "primitives/modes/size/global",
+    "primitives/modes/typography/size/small",
+    "primitives/modes/typography/size/medium",
+    "primitives/modes/typography/size/large",
+    "primitives/modes/typography/primary/novari",
+    "primitives/modes/typography/secondary/novari",
+    "primitives/modes/color-scheme/dark/novari",
+    "primitives/modes/color-scheme/light/novari",
+    "themes/novari",
+    "semantic/color",
+    "semantic/modes/main-color/accent",
+    "semantic/modes/support-color/brand1",
+    "semantic/modes/support-color/brand2",
+    "semantic/style"
+  ]
+}

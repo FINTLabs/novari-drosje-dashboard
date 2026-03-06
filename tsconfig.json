@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
+    "types": [
+      "./design-tokens-build/types.d.ts",
+      "@digdir/designsystemet-react/react-types"
+    ]
+  }
+}
