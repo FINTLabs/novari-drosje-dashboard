@@ -175,8 +175,8 @@ function App() {
                                 <Tag variant="outline" data-color="success">{value.status}</Tag>
                             </Table.Cell>
                             <Table.Cell>{value.caseId}</Table.Cell>
-                            <Table.Cell>{value.archivedDate.toString()}</Table.Cell>
-                            <Table.Cell>{value.updatedDate.toString()}</Table.Cell>
+                            <Table.Cell>{value.archivedDate?.toString()}</Table.Cell>
+                            <Table.Cell>{value.updatedDate?.toString()}</Table.Cell>
                         </Table.Row>
                     ))
                     }
