@@ -42,7 +42,7 @@ function App() {
 
     const filteredApplications = application
         .filter(application =>
-            application.subjectName.toLowerCase().includes(filter.toLowerCase()) ||
+            application.subjectName?.toLowerCase().includes(filter.toLowerCase()) ||
             application.archiveReference.toLowerCase().startsWith(filter.toLowerCase()) ||
             application.caseId?.toLowerCase().startsWith(filter.toLowerCase())
         )
