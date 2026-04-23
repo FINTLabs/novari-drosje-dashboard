@@ -182,7 +182,7 @@ function App() {
                 <Table.Head>
                     <Table.Row>
                         <Table.HeaderCell>Fylke</Table.HeaderCell>
-                        <Table.HeaderCell>AppId</Table.HeaderCell>
+                        <Table.HeaderCell>App</Table.HeaderCell>
                         <Table.HeaderCell>Altinnreferanse</Table.HeaderCell>
                         <Table.HeaderCell>Søker</Table.HeaderCell>
                         <Table.HeaderCell>Status</Table.HeaderCell>
