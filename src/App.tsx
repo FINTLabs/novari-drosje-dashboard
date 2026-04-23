@@ -17,6 +17,7 @@ import {Search} from "@digdir/designsystemet-react";
 
 type Application = {
     archiveReference: string
+    appId: string
     requestorName: string
     subjectName: string
     status: string
@@ -39,6 +40,9 @@ function App() {
     const [filter, setFilter] = useState<string>("");
     const [filterStatus, setFilterStatus] = useState<string>("ALL");
     const [filterOrganisation, setFilterOrganisation] = useState<string>("ALL");
+    const [filterAppId, setFilterAppId] = useState<string>("ALL");
+
+    const uniqueAppIds = Array.from(new Set(application.map(app => app.appId || "legacy/drosjeloyve")));
 
     const filteredApplications = application
         .filter(application =>
@@ -51,7 +55,12 @@ function App() {
         )
         .filter(application =>
             filterOrganisation != "ALL" ? application.requestorName === filterOrganisation : true
-        );
+        )
+        .filter(application => {
+            if (filterAppId === "ALL") return true;
+            if (filterAppId === "legacy/drosjeloyve") return !application.appId;
+            return application.appId === filterAppId;
+        });
 
     useEffect(() => {
         axios
@@ -110,6 +119,23 @@ function App() {
                 </Paragraph>
             </Alert>}
 
+            <h2>App</h2>
+            <ToggleGroup data-toggle-group="app" style={{display: "flex", flexWrap: "wrap", height: "auto"}} onChange={(e) => {
+                setFilterAppId(e)
+                setCurrentPage(1)
+            }}>
+                <ToggleGroup.Item
+                    value={"ALL"} key={"all"}>
+                    Alle
+                </ToggleGroup.Item>
+                {uniqueAppIds.map(appId => (
+                    <ToggleGroup.Item value={appId} key={appId}>
+                        {appId}
+                    </ToggleGroup.Item>
+                ))}
+            </ToggleGroup>
+
+
             <h2>Statuser</h2>
             <ToggleGroup data-toggle-group="status"  style={{display: "flex", flexWrap: "wrap", height: "auto"}} onChange={(e) => {
                 setFilterStatus(e)
@@ -156,6 +182,7 @@ function App() {
                 <Table.Head>
                     <Table.Row>
                         <Table.HeaderCell>Fylke</Table.HeaderCell>
+                        <Table.HeaderCell>AppId</Table.HeaderCell>
                         <Table.HeaderCell>Altinnreferanse</Table.HeaderCell>
                         <Table.HeaderCell>Søker</Table.HeaderCell>
                         <Table.HeaderCell>Status</Table.HeaderCell>
@@ -169,6 +196,7 @@ function App() {
                         currentPage * numberApplicationsPerPage).map(value => (
                         <Table.Row key={value.archiveReference}>
                             <Table.Cell>{value.requestorName}</Table.Cell>
+                            <Table.Cell>{value.appId || "legacy/drosjeloyve"}</Table.Cell>
                             <Table.Cell>{value.archiveReference}</Table.Cell>
                             <Table.Cell>{value.subjectName}</Table.Cell>
                             <Table.Cell>
