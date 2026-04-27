@@ -15,6 +15,9 @@ import {
 import {Tag} from "@digdir/designsystemet-react";
 import {Search} from "@digdir/designsystemet-react";
 
+const formatDate = (date: Date | string | undefined): string =>
+    date ? new Date(date).toLocaleString("nb-NO", { dateStyle: "short", timeStyle: "short" }) : "";
+
 type Application = {
     archiveReference: string
     appId: string
@@ -203,8 +206,8 @@ function App() {
                                 <Tag variant="outline" data-color="success">{value.status}</Tag>
                             </Table.Cell>
                             <Table.Cell>{value.caseId}</Table.Cell>
-                            <Table.Cell>{value.archivedDate?.toString()}</Table.Cell>
-                            <Table.Cell>{value.updatedDate?.toString()}</Table.Cell>
+                            <Table.Cell>{formatDate(value.archivedDate)}</Table.Cell>
+                            <Table.Cell>{formatDate(value.updatedDate)}</Table.Cell>
                         </Table.Row>
                     ))
                     }
