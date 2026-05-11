@@ -11,3 +11,49 @@
 .card {
   padding: 2em;
 }
+
+
+
+.filter-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.25rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+[aria-pressed="true"] .filter-count,
+[data-state="on"] .filter-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: inherit;
+}
+
+.filter-item-empty {
+  opacity: 0.4;
+}
+
+.filter-item-empty .filter-count {
+  background: transparent;
+  border: 1px dashed currentColor;
+}
+
+.ds-search button[type="reset"]::before {
+  content: "×";
+  font-size: 1.5rem;
+  line-height: 1;
+  color: white;
+}

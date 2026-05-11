@@ -4,16 +4,17 @@ import axios from "axios"
 import {useState, useEffect} from "react";
 import {
     Alert,
+    Button,
     Divider,
     Heading,
     Pagination,
     Paragraph,
+    Search,
     Table,
+    Tag,
     ToggleGroup,
     usePagination
 } from "@digdir/designsystemet-react";
-import {Tag} from "@digdir/designsystemet-react";
-import {Search} from "@digdir/designsystemet-react";
 
 const formatDate = (date: Date | string | undefined): string =>
     date ? new Date(date).toLocaleString("nb-NO", { dateStyle: "short", timeStyle: "short" }) : "";
@@ -47,23 +48,34 @@ function App() {
 
     const uniqueAppIds = Array.from(new Set(application.map(app => app.appId || "legacy/drosjeloyve")));
 
-    const filteredApplications = application
-        .filter(application =>
-            application.subjectName?.toLowerCase().includes(filter.toLowerCase()) ||
-            application.archiveReference.toLowerCase().startsWith(filter.toLowerCase()) ||
-            application.caseId?.toLowerCase().startsWith(filter.toLowerCase())
-        )
-        .filter(application =>
-            filterStatus != "ALL" ? application.status === filterStatus : true
-        )
-        .filter(application =>
-            filterOrganisation != "ALL" ? application.requestorName === filterOrganisation : true
-        )
-        .filter(application => {
-            if (filterAppId === "ALL") return true;
-            if (filterAppId === "legacy/drosjeloyve") return !application.appId;
-            return application.appId === filterAppId;
-        });
+    const matchesSearch = (a: Application) =>
+        a.subjectName?.toLowerCase().includes(filter.toLowerCase()) ||
+        a.archiveReference.toLowerCase().startsWith(filter.toLowerCase()) ||
+        a.caseId?.toLowerCase().startsWith(filter.toLowerCase());
+    const matchesStatus = (a: Application, v: string) => v === "ALL" || a.status === v;
+    const matchesOrg = (a: Application, v: string) => v === "ALL" || a.requestorName === v;
+    const matchesApp = (a: Application, v: string) => {
+        if (v === "ALL") return true;
+        if (v === "legacy/drosjeloyve") return !a.appId;
+        return a.appId === v;
+    };
+
+    const filteredApplications = application.filter(a =>
+        matchesSearch(a) &&
+        matchesStatus(a, filterStatus) &&
+        matchesOrg(a, filterOrganisation) &&
+        matchesApp(a, filterAppId)
+    );
+
+    const appCount = (v: string) => application.filter(a =>
+        matchesSearch(a) && matchesStatus(a, filterStatus) && matchesOrg(a, filterOrganisation) && matchesApp(a, v)
+    ).length;
+    const statusCount = (v: string) => application.filter(a =>
+        matchesSearch(a) && matchesApp(a, filterAppId) && matchesOrg(a, filterOrganisation) && matchesStatus(a, v)
+    ).length;
+    const orgCount = (v: string) => application.filter(a =>
+        matchesSearch(a) && matchesApp(a, filterAppId) && matchesStatus(a, filterStatus) && matchesOrg(a, v)
+    ).length;
 
     useEffect(() => {
         axios
@@ -122,65 +134,87 @@ function App() {
                 </Paragraph>
             </Alert>}
 
-            <h2>App</h2>
-            <ToggleGroup data-toggle-group="app" style={{display: "flex", flexWrap: "wrap", height: "auto"}} onChange={(e) => {
-                setFilterAppId(e)
-                setCurrentPage(1)
-            }}>
-                <ToggleGroup.Item
-                    value={"ALL"} key={"all"}>
-                    Alle
-                </ToggleGroup.Item>
-                {uniqueAppIds.map(appId => (
-                    <ToggleGroup.Item value={appId} key={appId}>
-                        {appId}
+            <div className="filter-panel">
+                <h2>App</h2>
+                <ToggleGroup
+                    data-toggle-group="app"
+                    value={filterAppId}
+                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
+                    onChange={(e) => {
+                        setFilterAppId(e)
+                        setCurrentPage(1)
+                    }}
+                >
+                    <ToggleGroup.Item value="ALL">
+                        <span className={`filter-item${appCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{appCount("ALL")}</span></span>
                     </ToggleGroup.Item>
-                ))}
-            </ToggleGroup>
+                    {uniqueAppIds.map(appId => (
+                        <ToggleGroup.Item value={appId} key={appId}>
+                            <span className={`filter-item${appCount(appId) === 0 ? " filter-item-empty" : ""}`}>{appId}<span className="filter-count">{appCount(appId)}</span></span>
+                        </ToggleGroup.Item>
+                    ))}
+                </ToggleGroup>
 
-
-            <h2>Statuser</h2>
-            <ToggleGroup data-toggle-group="status"  style={{display: "flex", flexWrap: "wrap", height: "auto"}} onChange={(e) => {
-                setFilterStatus(e)
-                setCurrentPage(1)
-            }}>
-                <ToggleGroup.Item
-                    value={"ALL"} key={"all"}>
-                    ALL
-                </ToggleGroup.Item>
-                {status.map(value => (
-                    <ToggleGroup.Item key={value}
-                        value={value}>
-                        {value}
+                <h2>Statuser</h2>
+                <ToggleGroup
+                    data-toggle-group="status"
+                    value={filterStatus}
+                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
+                    onChange={(e) => {
+                        setFilterStatus(e)
+                        setCurrentPage(1)
+                    }}
+                >
+                    <ToggleGroup.Item value="ALL">
+                        <span className={`filter-item${statusCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{statusCount("ALL")}</span></span>
                     </ToggleGroup.Item>
-                ))}
-            </ToggleGroup>
+                    {status.map(value => (
+                        <ToggleGroup.Item value={value} key={value}>
+                            <span className={`filter-item${statusCount(value) === 0 ? " filter-item-empty" : ""}`}>{value}<span className="filter-count">{statusCount(value)}</span></span>
+                        </ToggleGroup.Item>
+                    ))}
+                </ToggleGroup>
 
-
-            <h2>Organisasjoner</h2>
-            <ToggleGroup data-toggle-group="org" style={{display: "flex", flexWrap: "wrap", height: "auto"}} onChange={(e) => {
-                setFilterOrganisation(e)
-                setCurrentPage(1)
-            }}>
-                <ToggleGroup.Item
-                    value={"ALL"} key={"all"}>
-                    Alle
-                </ToggleGroup.Item>
-                {Object.entries(organisation).map(([, value]) => (
-                    <ToggleGroup.Item value={value.toString()} key={value}>{value}</ToggleGroup.Item>
-                ))}
-            </ToggleGroup>
-
+                <h2>Organisasjoner</h2>
+                <ToggleGroup
+                    data-toggle-group="org"
+                    value={filterOrganisation}
+                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
+                    onChange={(e) => {
+                        setFilterOrganisation(e)
+                        setCurrentPage(1)
+                    }}
+                >
+                    <ToggleGroup.Item value="ALL">
+                        <span className={`filter-item${orgCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{orgCount("ALL")}</span></span>
+                    </ToggleGroup.Item>
+                    {Object.entries(organisation).map(([, value]) => (
+                        <ToggleGroup.Item value={value.toString()} key={value}>
+                            <span className={`filter-item${orgCount(value.toString()) === 0 ? " filter-item-empty" : ""}`}>{value}<span className="filter-count">{orgCount(value.toString())}</span></span>
+                        </ToggleGroup.Item>
+                    ))}
+                </ToggleGroup>
+            </div>
 
             <h2>Søk</h2>
-            <Search>
-                <Search.Input id="search" aria-label='Søk' placeholder="Søk på altinnreferanse, søker eller saksnummer" onChange={(e) => {
-                    setFilter(e.target.value)
-                }} />
-                <Search.Clear  style={{backgroundColor: "#F76650"}} />
+            <Search style={{marginBottom: "var(--ds-size-4)"}}>
+                <Search.Input
+                    id="search"
+                    aria-label="Søk"
+                    placeholder="Søk på altinnreferanse, søker eller saksnummer"
+                    value={filter}
+                    onChange={(e) => {
+                        setFilter(e.target.value)
+                        setCurrentPage(1)
+                    }}
+                />
+                <Search.Clear style={{backgroundColor: "#F76650"}} />
             </Search>
 
-            <h2>Søknader</h2>
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: "var(--ds-size-6)"}}>
+                <h2 style={{margin: 0}}>Søknader</h2>
+                <Paragraph data-size="sm">{filteredApplications.length} treff</Paragraph>
+            </div>
             <Table zebra>
                 <Table.Head>
                     <Table.Row>
