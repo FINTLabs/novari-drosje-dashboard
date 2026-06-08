@@ -2,6 +2,9 @@ import novariLogo from '/novari.svg'
 import './App.css'
 import axios from "axios"
 import {useState, useEffect} from "react";
+import type { Application, Organisation } from "./types";
+import { ApplicationsTable } from "./components/ApplicationsTable";
+import { FiltersPanel } from "./components/FiltersPanel";
 import {
     Alert,
     Divider,
@@ -9,29 +12,8 @@ import {
     Pagination,
     Paragraph,
     Search,
-    Table,
-    Tag,
-    ToggleGroup,
     usePagination
 } from "@digdir/designsystemet-react";
-
-const formatDate = (date: Date | string | undefined): string =>
-    date ? new Date(date).toLocaleString("nb-NO", { dateStyle: "short", timeStyle: "short" }) : "";
-
-type Application = {
-    archiveReference: string
-    appId: string
-    requestorName: string
-    subjectName: string
-    status: string
-    caseId: string
-    archivedDate: Date
-    updatedDate: Date
-}
-
-type Organisation = {
-    [key: string] : string
-}
 
 function App() {
 
@@ -111,6 +93,11 @@ function App() {
         showPages: 11,
     });
 
+    const paginatedApplications = filteredApplications.slice(
+        (currentPage * numberApplicationsPerPage) - numberApplicationsPerPage,
+        currentPage * numberApplicationsPerPage
+    );
+
 
     return (
         <>
@@ -133,67 +120,29 @@ function App() {
                 </Paragraph>
             </Alert>}
 
-            <div className="filter-panel">
-                <h2>App</h2>
-                <ToggleGroup
-                    data-toggle-group="app"
-                    value={filterAppId}
-                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
-                    onChange={(e) => {
-                        setFilterAppId(e)
-                        setCurrentPage(1)
-                    }}
-                >
-                    <ToggleGroup.Item value="ALL">
-                        <span className={`filter-item${appCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{appCount("ALL")}</span></span>
-                    </ToggleGroup.Item>
-                    {uniqueAppIds.map(appId => (
-                        <ToggleGroup.Item value={appId} key={appId}>
-                            <span className={`filter-item${appCount(appId) === 0 ? " filter-item-empty" : ""}`}>{appId}<span className="filter-count">{appCount(appId)}</span></span>
-                        </ToggleGroup.Item>
-                    ))}
-                </ToggleGroup>
-
-                <h2>Statuser</h2>
-                <ToggleGroup
-                    data-toggle-group="status"
-                    value={filterStatus}
-                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
-                    onChange={(e) => {
-                        setFilterStatus(e)
-                        setCurrentPage(1)
-                    }}
-                >
-                    <ToggleGroup.Item value="ALL">
-                        <span className={`filter-item${statusCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{statusCount("ALL")}</span></span>
-                    </ToggleGroup.Item>
-                    {status.map(value => (
-                        <ToggleGroup.Item value={value} key={value}>
-                            <span className={`filter-item${statusCount(value) === 0 ? " filter-item-empty" : ""}`}>{value}<span className="filter-count">{statusCount(value)}</span></span>
-                        </ToggleGroup.Item>
-                    ))}
-                </ToggleGroup>
-
-                <h2>Organisasjoner</h2>
-                <ToggleGroup
-                    data-toggle-group="org"
-                    value={filterOrganisation}
-                    style={{display: "flex", flexWrap: "wrap", height: "auto"}}
-                    onChange={(e) => {
-                        setFilterOrganisation(e)
-                        setCurrentPage(1)
-                    }}
-                >
-                    <ToggleGroup.Item value="ALL">
-                        <span className={`filter-item${orgCount("ALL") === 0 ? " filter-item-empty" : ""}`}>Alle<span className="filter-count">{orgCount("ALL")}</span></span>
-                    </ToggleGroup.Item>
-                    {Object.entries(organisation).map(([, value]) => (
-                        <ToggleGroup.Item value={value.toString()} key={value}>
-                            <span className={`filter-item${orgCount(value.toString()) === 0 ? " filter-item-empty" : ""}`}>{value}<span className="filter-count">{orgCount(value.toString())}</span></span>
-                        </ToggleGroup.Item>
-                    ))}
-                </ToggleGroup>
-            </div>
+            <FiltersPanel
+                filterAppId={filterAppId}
+                filterStatus={filterStatus}
+                filterOrganisation={filterOrganisation}
+                uniqueAppIds={uniqueAppIds}
+                statuses={status}
+                organisation={organisation}
+                appCount={appCount}
+                statusCount={statusCount}
+                orgCount={orgCount}
+                onAppChange={(e) => {
+                    setFilterAppId(e)
+                    setCurrentPage(1)
+                }}
+                onStatusChange={(e) => {
+                    setFilterStatus(e)
+                    setCurrentPage(1)
+                }}
+                onOrganisationChange={(e) => {
+                    setFilterOrganisation(e)
+                    setCurrentPage(1)
+                }}
+            />
 
             <h2>Søk</h2>
             <Search style={{marginBottom: "var(--ds-size-4)"}}>
@@ -214,38 +163,7 @@ function App() {
                 <h2 style={{margin: 0}}>Søknader</h2>
                 <Paragraph data-size="sm">{filteredApplications.length} treff</Paragraph>
             </div>
-            <Table zebra>
-                <Table.Head>
-                    <Table.Row>
-                        <Table.HeaderCell>Fylke</Table.HeaderCell>
-                        <Table.HeaderCell>App</Table.HeaderCell>
-                        <Table.HeaderCell>Altinnreferanse</Table.HeaderCell>
-                        <Table.HeaderCell>Søker</Table.HeaderCell>
-                        <Table.HeaderCell>Status</Table.HeaderCell>
-                        <Table.HeaderCell>Saksnummer</Table.HeaderCell>
-                        <Table.HeaderCell>Opprettet</Table.HeaderCell>
-                        <Table.HeaderCell>Oppdatert</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                    {filteredApplications.slice((currentPage * numberApplicationsPerPage) - numberApplicationsPerPage,
-                        currentPage * numberApplicationsPerPage).map(value => (
-                        <Table.Row key={value.archiveReference}>
-                            <Table.Cell>{value.requestorName}</Table.Cell>
-                            <Table.Cell>{value.appId || "legacy/drosjeloyve"}</Table.Cell>
-                            <Table.Cell>{value.archiveReference}</Table.Cell>
-                            <Table.Cell>{value.subjectName}</Table.Cell>
-                            <Table.Cell>
-                                <Tag variant="outline" data-color="success">{value.status}</Tag>
-                            </Table.Cell>
-                            <Table.Cell>{value.caseId}</Table.Cell>
-                            <Table.Cell>{formatDate(value.archivedDate)}</Table.Cell>
-                            <Table.Cell>{formatDate(value.updatedDate)}</Table.Cell>
-                        </Table.Row>
-                    ))
-                    }
-                </Table.Body>
-            </Table>
+            <ApplicationsTable applications={paginatedApplications} />
 
             {pages.length > 1 && (
             <div style={{display: "flex", justifyContent: "right", alignItems: "right", marginTop: "1rem", marginBottom: "1rem"}}>
