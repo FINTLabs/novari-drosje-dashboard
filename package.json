@@ -12,22 +12,22 @@
   "dependencies": {
     "@digdir/designsystemet-css": "^1.12.1",
     "@digdir/designsystemet-react": "^1.12.1",
-    "axios": "1.16.0",
+    "axios": "^1.18.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.3.3",
+    "@types/node": "^26.1.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^6.0.4",
     "eslint": "^10.2.0",
-    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
-    "vite": "8.0.16"
+    "vite": "^8.1.5"
   }
 }
