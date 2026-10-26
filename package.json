@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@digdir/designsystemet-css": "^1.12.1",
+    "@digdir/designsystemet-css": "^1.23.0",
     "@digdir/designsystemet-react": "^1.23.0",
     "axios": "^1.20.0",
     "react": "^19.3.1",
