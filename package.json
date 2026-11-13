@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@digdir/designsystemet-css": "^1.23.0",
-    "@digdir/designsystemet-react": "^1.23.0",
+    "@digdir/designsystemet-react": "^1.24.0",
     "axios": "^1.21.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
